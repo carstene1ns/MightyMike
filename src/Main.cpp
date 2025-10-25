@@ -55,6 +55,12 @@ tryAgain:
 			dataPath = "Data";
 			break;
 
+#ifdef __SWITCH__
+		case 3:
+			dataPath = "romfs:/";
+			break;
+#endif
+
 		default:
 			throw std::runtime_error("Couldn't find the Data folder.");
 	}

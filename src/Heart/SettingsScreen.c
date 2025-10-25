@@ -90,7 +90,9 @@ static void DeleteTextAtRowCol(int row, int col);
 static const char* GetKeyBindingName(int row, int col);
 static const char* GetPadBindingName(int row, int col);
 static void OnDone(void);
+#ifndef __SWITCH__
 static void OnChangeFullscreenMode(void);
+#endif
 static void OnChangePlayfieldSizeViaSettings(void);
 static void OnChangeDebugInfoInTitleBar(void);
 static void OnResetKeys(void);
@@ -157,6 +159,7 @@ static MenuItem gVideoMenu[] =
 			.choices = { "32 fps, like original", "smooth" },
 		}
 	},
+#ifndef __SWITCH__
 	{ .type = kMenuItem_Separator },
 	{
 		.type = kMenuItem_Cycler, .cycler =
@@ -233,7 +236,7 @@ static MenuItem gVideoMenu[] =
 		}
 	},
 #endif
-
+#endif
 	{ .type = kMenuItem_Separator },
 
 #if EXPOSE_DITHERING
@@ -388,7 +391,9 @@ static MenuItem gRootMenu[] =
 {
 	{ .type = kMenuItem_Label, .label = " SETTINGS", },
 	{ .type = kMenuItem_Separator },
+#ifndef __SWITCH__
 	{ .type = kMenuItem_Submenu, .submenu = {.caption = "configure keyboard",	.menu = gKeyboardMenu} },
+#endif
 #if !(NOJOYSTICK)
 	{ .type = kMenuItem_Submenu, .submenu = {.caption = "configure gamepad",	.menu = gGamepadMenu} },
 #endif
@@ -503,6 +508,7 @@ static void RemapRedToGray(int row)
 
 static void OnMenuEntered(void)
 {
+#ifndef __SWITCH__
 	if (gMenu == gVideoMenu)
 	{
 		{
@@ -527,6 +533,7 @@ static void OnMenuEntered(void)
 		}
 #endif
 	}
+#endif
 }
 
 /****************************/
@@ -567,6 +574,7 @@ static void OnDone(void)
 	}
 }
 
+#ifndef __SWITCH__
 static void OnChangeFullscreenMode(void)
 {
 #if !OSXPPC
@@ -579,6 +587,7 @@ static void OnChangeFullscreenMode(void)
 	DumpBackground();
 #endif
 }
+#endif
 
 static void OnChangePlayfieldSizeViaSettings(void)
 {

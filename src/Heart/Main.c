@@ -1264,7 +1264,11 @@ static void InitDefaultPrefs(void)
 
 #if !OSXPPC
 	gGamePrefs.pfSize = PFSIZE_WIDE;
+#ifdef __SWITCH__
+	gGamePrefs.displayMode = kDisplayMode_Windowed;
+#else
 	gGamePrefs.displayMode = kDisplayMode_FullscreenStretched;
+#endif
 	gGamePrefs.filterDithering = true;
 #else
 	gGamePrefs.pfSize = PFSIZE_MEDIUM;

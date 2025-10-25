@@ -27,7 +27,6 @@ project(${GAME_TARGET}
 )
 
 option(SANITIZE "Build with asan/ubsan" OFF)
-
 if(SANITIZE)
 	message("Sanitizers enabled")
 else()
@@ -64,7 +63,7 @@ set(POMME_NO_MP3 true)
 add_subdirectory(extern/Pomme)
 
 find_package(SDL2 REQUIRED COMPONENTS main)
-find_package(OpenGL REQUIRED)  # only actually required if we want to force GLRENDER
+#find_package(OpenGL REQUIRED)  # only actually required if we want to force GLRENDER
 find_package(Threads REQUIRED)
 
 #------------------------------------------------------------------------------
@@ -96,7 +95,7 @@ set(GAME_LIBRARIES
 	Pomme
 	${SDL2_LIBRARIES}
 	${CMAKE_THREAD_LIBS_INIT}
-	OpenGL::GL
+#	OpenGL::GL
 )
 
 if(WIN32)
@@ -128,19 +127,18 @@ target_include_directories(${GAME_TARGET} PRIVATE
 	${GAME_SRCDIR}/Headers
 )
 
-
 #------------------------------------------------------------------------------
 # COMPILER/LINKER OPTIONS
 #------------------------------------------------------------------------------
 
 add_compile_definitions(
 	"$<$<CONFIG:DEBUG>:_DEBUG>"
-	GLRENDER    # comment out to use SDL's 2D renderer
+	#GLRENDER    # comment out to use SDL's 2D renderer
 	#NOVSYNC
 )
 
-target_compile_definitions(${GAME_TARGET} PRIVATE
-	GL_SILENCE_DEPRECATION)
+#target_compile_definitions(${GAME_TARGET} PRIVATE
+#	GL_SILENCE_DEPRECATION)
 
 if(NOT MSVC)
 	target_compile_options(${GAME_TARGET} PRIVATE
@@ -195,6 +193,13 @@ else()
 	# Enable console for debug builds
 	set_target_properties(${GAME_TARGET} PROPERTIES LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE")
 	set_target_properties(${GAME_TARGET} PROPERTIES COMPILE_DEFINITIONS_DEBUG "_CONSOLE")
+endif()
+
+if(NINTENDO_SWITCH)
+	target_compile_options(${GAME_TARGET}
+		PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
+	target_sources(${GAME_TARGET} PRIVATE src/SwitchMisc.cpp)
+	dkp_target_generate_symbol_list(${GAME_TARGET})
 endif()
 
 target_link_libraries(${GAME_TARGET} ${GAME_LIBRARIES})
@@ -281,6 +286,15 @@ if(APPLE)
 		# Make it honor mainmenu.nib (use -replace instead of -insert so it doesn't fail on subsequent builds)
 		COMMAND plutil -replace NSMainNibFile -string "mainmenu" ${BUNDLE_CONTENTS_DIR}/Info.plist
 	)
+elseif(NINTENDO_SWITCH)
+	nx_generate_nacp(easyrpg-player.nacp
+		NAME ${GAME_MAC_BUNDLE_NAME}
+		AUTHOR "Pangea Software, Iliyas Jorio, carstene1ns"
+		VERSION ${GAME_VERSION})
+	nx_create_nro(${GAME_TARGET}
+		NACP easyrpg-player.nacp
+		ICON packaging/MightyMikeSwitch.jpg
+		ROMFS Data)
 else()
 	set(APP_PARENT_DIR "$<TARGET_FILE_DIR:${GAME_TARGET}>")
 
